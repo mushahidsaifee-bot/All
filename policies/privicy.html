@@ -221,7 +221,7 @@
         </div>
         <div class="meta-item">
           <strong>Package ID</strong>
-          <code>com.aistudio.bmicalc.qvxrkm</code>
+          <code>com.gazi.bmi.calculator</code>
         </div>
         <div class="meta-item">
           <strong>Version</strong>
@@ -229,7 +229,7 @@
         </div>
         <div class="meta-item">
           <strong>Last Updated</strong>
-          November 16, 2026
+          November 18, 2026
         </div>
       </div>
     </header>
@@ -242,9 +242,9 @@
         </div>
         <ul>
           <li><strong>No Account Required:</strong> You do not need to create an account, sign in, or give your name, email address, or phone number to use the app.</li>
-          <li><strong>Works Offline:</strong> All BMI calculations and saved history features work completely offline on your device.</li>
-          <li><strong>No Server Uploads:</strong> We do not have a server that collects or stores your BMI records or personal measurements.</li>
-          <li><strong>No Ads &amp; No Tracking:</strong> The app contains no advertisements, analytics, or third-party tracking SDKs.</li>
+          <li><strong>Works Offline:</strong> All BMI calculations and saved history features work completely offline on your device without interruption.</li>
+          <li><strong>No Server Uploads:</strong> We do not operate a server that collects or stores your BMI records or personal measurements.</li>
+          <li><strong>Ad-Supported via Start.io:</strong> The app displays Start.io banner and interstitial advertisements after 8 calculations when an internet connection is available. Your BMI measurements are never shared with ad networks.</li>
         </ul>
       </section>
 
@@ -257,7 +257,8 @@
         <ul>
           <li><strong>Metric &amp; Imperial Units:</strong> Calculate BMI using centimeters and kilograms (Metric) or feet, inches, and pounds (Imperial).</li>
           <li><strong>Optional Details:</strong> You may optionally enter your age (2–120 years) and select a gender option (Male, Female, or Unspecified) for your own reference. If an age under 20 is entered, the app displays a notice explaining that standard adult BMI categories apply to adults aged 20 and above.</li>
-          <li><strong>Detailed Result Screen:</strong> Shows your calculated BMI number, category (Underweight, Normal, Overweight, Obesity Class 1, Obesity Class 2, or Obesity Class 3), a visual BMI range indicator, the healthy weight range for your height, and a simple weight suggestion.</li>
+          <li><strong>Detailed Result Screen &amp; BMI Chart:</strong> Shows your calculated BMI number, category (Underweight, Normal, Overweight, Obesity Class 1, Obesity Class 2, or Obesity Class 3), a visual BMI range indicator, an interactive 6-band BMI Chart highlighting your position, the healthy weight range for your height, and a simple weight suggestion.</li>
+          <li><strong>Share Result as Image:</strong> Tap <em>Share Result</em> to generate an image card (including your BMI score, category, healthy weight reference, and BMI Chart) on your device and share it via Android's system Sharesheet.</li>
           <li><strong>Local History:</strong> Save any result to your device's local history, review past results at any time, delete individual entries, or clear your entire history with one tap.</li>
           <li><strong>Customizable Settings:</strong> Choose between System, Light, or Dark theme, set your default measurement unit (Metric or Imperial), and review the BMI calculation methodology and disclaimers inside the app.</li>
         </ul>
@@ -283,9 +284,14 @@
               <td>Saved only when you tap <em>Save Result</em>, inside a private on-device SQLite database (Room database <code>bmi_calculator_db</code>) so you can view your History later.</td>
             </tr>
             <tr>
-              <td><strong>App Preferences</strong></td>
-              <td>Selected theme (System, Light, or Dark) and default unit system (Metric or Imperial).</td>
-              <td>Stored privately on your device using Android Jetpack DataStore (<code>bmi_user_preferences</code>) and SharedPreferences (<code>bmi_boot_cache</code>) to remember your settings.</td>
+              <td><strong>App Preferences &amp; Ad Counter</strong></td>
+              <td>Selected theme (System, Light, or Dark), default unit system (Metric or Imperial), and local BMI calculation count.</td>
+              <td>Stored privately on your device using Android Jetpack DataStore (<code>bmi_user_preferences</code>) and SharedPreferences (<code>bmi_boot_cache</code>) to remember your settings and track the 8-calculation ad threshold.</td>
+            </tr>
+            <tr>
+              <td><strong>Shared Result Image (Optional)</strong></td>
+              <td>A PNG image card rendered locally from your displayed BMI result and BMI Chart.</td>
+              <td>Generated temporarily inside the app's private cache folder (<code>shared_bmi/</code>) via Android <code>FileProvider</code> only when you tap <em>Share Result</em>, so you can share it through apps you choose in the Android Sharesheet.</td>
             </tr>
           </tbody>
         </table>
@@ -293,31 +299,44 @@
           <strong>No Cloud Backup:</strong> Android automatic cloud backup is disabled in this app (<code>android:allowBackup="false"</code>), meaning your local BMI history database is not automatically backed up to Google Drive by the app.
         </p>
         <p>
-          <strong>No Sharing of Measurements:</strong> We never read, copy, sell, or send your height, weight, age, gender, or BMI history to external servers or any third party.
+          <strong>No Sharing of Measurements:</strong> We never read, copy, sell, or send your height, weight, age, gender, or BMI history to external servers or advertising partners.
         </p>
       </section>
 
       <section id="advertising">
         <h2>4. Advertising &amp; Third-Party Services</h2>
         <p>
-          BMI Calculator does not display advertisements and does not integrate any third-party advertising or analytics SDKs.
+          BMI Calculator is free to use and integrates the <strong>Start.io</strong> (formerly StartApp) In-App Advertising SDK (<code>com.startapp:inapp-sdk</code>) to display advertisements when an internet connection is available:
         </p>
+        <ul>
+          <li><strong>When Ads Are Shown:</strong> Interstitial ads may appear on the Calculator screen at and every 8 valid BMI calculations, and banner ads may appear in the History section after 8 calculations. If your mobile network or Wi-Fi is off, or if an ad fails to load, no empty banner space is kept and you can continue using the app normally.</li>
+          <li><strong>No Launch Pop-Ups:</strong> Automatic Start.io launch splash ads, return-to-app ads, and SDK consent pop-up dialogs are disabled.</li>
+          <li><strong>Information Collected by Start.io:</strong> While we never send your BMI measurements or history to Start.io, the Start.io SDK may automatically collect technical and advertising information—such as your Google Advertising ID (<code>AD_ID</code>), IP address (for approximate region/country), device model, operating system version, network type, and ad impression/click events—to deliver, measure, and prevent fraud in advertisements.</li>
+          <li><strong>Start.io Privacy Policy:</strong> Information processed by Start.io is governed by <a href="https://www.start.io/policy/privacy-policy/" target="_blank" rel="noopener noreferrer">Start.io's Privacy Policy</a>.</li>
+        </ul>
       </section>
 
       <section id="permissions">
         <h2>5. App Permissions Explained</h2>
         <p>
-          BMI Calculator works completely offline and does <strong>not</strong> require special device permissions. It never asks for access to your camera, location (GPS), microphone, contacts, photos, files, advertising ID, or health/fitness sensors.
+          BMI Calculator requests only the minimum network and advertising permissions needed for Start.io ads. It <strong>never</strong> requests access to your camera, location (GPS), microphone, contacts, photos, external storage, or health/fitness sensors (sharing a BMI image uses Android's private <code>FileProvider</code> cache with zero storage permissions):
         </p>
+        <ul>
+          <li><code>android.permission.INTERNET</code>: Used by the Start.io SDK to load advertisements when your device is online.</li>
+          <li><code>android.permission.ACCESS_NETWORK_STATE</code>: Used to detect whether mobile data or Wi-Fi is available so ad space collapses cleanly when offline.</li>
+          <li><code>com.google.android.gms.permission.AD_ID</code>: Used by the Start.io SDK on Android 12+ to access the resettable Google Advertising ID for ad delivery and measurement.</li>
+          <li><strong>Standard Start.io SDK Permissions:</strong> The integrated Start.io SDK also includes standard advertising SDK declarations (<code>ACCESS_WIFI_STATE</code>, <code>ACCESS_ADSERVICES_TOPICS</code>, <code>BIND_GET_INSTALL_REFERRER_SERVICE</code>, and <code>RECEIVE_BOOT_COMPLETED</code>) used solely by the SDK for ad delivery and attribution.</li>
+        </ul>
       </section>
 
       <section id="your-choices">
         <h2>6. Your Privacy Choices &amp; How to Delete Your Data</h2>
-        <p>You have full control over your data on your device:</p>
+        <p>You have full control over your data and ad preferences on your device:</p>
         <ul>
           <li><strong>Delete One Record:</strong> Open the <em>History</em> tab and tap the delete icon next to any saved BMI record (or open the record and tap <em>Delete Record</em>).</li>
           <li><strong>Clear All History:</strong> Open the <em>History</em> tab and tap <em>Clear All</em> to permanently erase all saved BMI records from your device.</li>
-          <li><strong>Remove Everything:</strong> You can clear the app's storage in Android Settings (<em>Settings &gt; Apps &gt; BMI Calculator &gt; Storage &gt; Clear data</em>) or uninstall the app to permanently remove all saved records and preferences.</li>
+          <li><strong>Manage Ad Personalization:</strong> You can reset or delete your Advertising ID or opt out of personalized ads in your Android system settings (typically <em>Settings &gt; Privacy &gt; Ads</em> or <em>Settings &gt; Google &gt; Ads</em>).</li>
+          <li><strong>Remove Everything:</strong> You can clear the app's storage in Android Settings (<em>Settings &gt; Apps &gt; BMI Calculator &gt; Storage &gt; Clear data</em>) or uninstall the app to permanently remove all saved records, preferences, and local counters.</li>
         </ul>
       </section>
 
@@ -360,7 +379,7 @@
     </main>
 
     <footer>
-      <p>&copy; 2026 BMI Calculator. All rights reserved.</p>
+      <p>&copy; 2026 BMI Calculator. All rights reserved. | <a href="./">About App</a> | <a href="terms.html">Terms &amp; Conditions</a></p>
     </footer>
   </div>
 </body>

@@ -1,4 +1,4 @@
-package com.example
+package com.gazi
 
 import android.app.Activity
 import android.app.Application
@@ -61,9 +61,11 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -192,6 +194,8 @@ class BmiApplication : Application() {
 
 interface AppContainer {
   val bmiRepository: BmiRepository
+  val adController: StartIoInterstitialController
+    get() = StartIoInterstitialController()
 }
 
 class DefaultAppContainer(context: Context) : AppContainer {
@@ -205,6 +209,10 @@ class DefaultAppContainer(context: Context) : AppContainer {
       bmiRecordDao = database.bmiRecordDao(),
       preferencesDataStore = preferencesDataStore,
     )
+  }
+
+  override val adController: StartIoInterstitialController by lazy {
+    StartIoInterstitialController()
   }
 }
 
@@ -237,7 +245,10 @@ class MainActivity : ComponentActivity() {
       val preferences by bmiViewModel.userPreferences.collectAsStateWithLifecycle()
 
       BmiCalculatorTheme(themeMode = preferences.themeMode) {
-        BmiAppShell(viewModel = bmiViewModel)
+        BmiAppShell(
+          viewModel = bmiViewModel,
+          adController = appContainer.adController,
+        )
       }
     }
   }
@@ -278,10 +289,12 @@ private enum class TopLevelTab(
 fun BmiAppShell(
   viewModel: BmiViewModel,
   modifier: Modifier = Modifier,
+  adController: StartIoInterstitialController = remember { StartIoInterstitialController() },
 ) {
   val navController = rememberNavController()
 
   var selectedTab by rememberSaveable { mutableStateOf(TopLevelTab.CALCULATOR) }
+  var isAwaitingAdNavigation by remember { mutableStateOf(false) }
 
   val snackbarHostState = remember { SnackbarHostState() }
   val scope = rememberCoroutineScope()
@@ -291,7 +304,7 @@ fun BmiAppShell(
 
   LaunchedEffect(isOnline) {
     if (isOnline) {
-      StartIoAdManager.preloadInterstitial(context, isOnline = true)
+      adController.preloadInterstitial(context, isOnline = true)
     }
   }
 
@@ -417,18 +430,21 @@ fun BmiAppShell(
                           onGenderSelected = viewModel::onGenderSelected,
                           onCalculateClicked = {
                             if (
-                              navController.currentBackStackEntry?.destination?.route !=
-                                BmiRoutes.MAIN_TABS
+                              isAwaitingAdNavigation ||
+                                navController.currentBackStackEntry?.destination?.route !=
+                                  BmiRoutes.MAIN_TABS
                             ) {
                               return@CalculatorScreen
                             }
                             if (viewModel.calculateAndPrepareResult()) {
                               val count = viewModel.calculationCount.value
                               if (AdDisplayRules.shouldShowInterstitialOnCalculation(count)) {
-                                StartIoAdManager.showInterstitialIfReadyOrProceed(
+                                isAwaitingAdNavigation = true
+                                adController.showInterstitialIfReadyOrProceed(
                                   context = context,
                                   isOnline = isOnline,
                                 ) {
+                                  isAwaitingAdNavigation = false
                                   navigateToResultSingleTop()
                                 }
                               } else {
@@ -436,7 +452,7 @@ fun BmiAppShell(
                                   isOnline &&
                                     count % AdDisplayRules.INTERSTITIAL_CALCULATION_INTERVAL >= 5
                                 ) {
-                                  StartIoAdManager.preloadInterstitial(context, isOnline = true)
+                                  adController.preloadInterstitial(context, isOnline = true)
                                 }
                                 navigateToResultSingleTop()
                               }
@@ -453,6 +469,7 @@ fun BmiAppShell(
                           records = historyRecords,
                           calculationCount = calculationCount,
                           isOnline = isOnline,
+                          isTabVisible = selectedTab == TopLevelTab.HISTORY,
                           onRecordClicked = { record ->
                             if (
                               navController.currentBackStackEntry?.destination?.route ==
@@ -503,6 +520,7 @@ fun BmiAppShell(
 
     composable(BmiRoutes.RESULT) {
       val resultState by viewModel.resultState.collectAsStateWithLifecycle()
+      var isSharing by remember { mutableStateOf(false) }
       Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -515,6 +533,21 @@ fun BmiAppShell(
             viewModel.saveCurrentResult()
             scope.launch {
               snackbarHostState.showSnackbar(context.getString(R.string.message_result_saved))
+            }
+          },
+          onShareClicked = { calculation ->
+            if (!isSharing) {
+              isSharing = true
+              scope.launch {
+                try {
+                  val result = BmiShareHelper.shareBmiResultImage(context, calculation)
+                  if (result.isFailure) {
+                    snackbarHostState.showSnackbar(context.getString(R.string.share_bmi_error))
+                  }
+                } finally {
+                  isSharing = false
+                }
+              }
             }
           },
           onRecalculateClicked = {
@@ -2620,6 +2653,7 @@ fun ResultScreen(
   onDeleteRecordClicked: (Long) -> Unit,
   onBackClicked: () -> Unit,
   modifier: Modifier = Modifier,
+  onShareClicked: (BmiCalculation) -> Unit = {},
 ) {
   val context = LocalContext.current
   val calculation = state.calculation
@@ -2657,6 +2691,17 @@ fun ResultScreen(
         }
       },
       actions = {
+        if (calculation != null) {
+          IconButton(
+            onClick = { onShareClicked(calculation) },
+            modifier = Modifier.testTag("result_share_button"),
+          ) {
+            Icon(
+              imageVector = Icons.Outlined.Share,
+              contentDescription = stringResource(R.string.action_share_result),
+            )
+          }
+        }
         if (state.isFromHistory && calculation?.savedRecordId != null) {
           IconButton(
             onClick = { showDeleteDialog = true },
@@ -2783,6 +2828,11 @@ fun ResultScreen(
           }
         }
 
+        BmiChartCard(
+          bmi = calculation.bmi,
+          activeCategory = calculation.category,
+        )
+
         FlatSectionCard {
           Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -2877,7 +2927,169 @@ fun ResultScreen(
           }
         }
 
+        FilledTonalButton(
+          onClick = { onShareClicked(calculation) },
+          shape = RoundedCornerShape(12.dp),
+          modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("share_result_button"),
+        ) {
+          Icon(
+            imageVector = Icons.Outlined.Share,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+          )
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(text = stringResource(R.string.action_share_result))
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
+      }
+    }
+  }
+}
+
+@Composable
+private fun BmiChartCard(
+  bmi: Double,
+  activeCategory: BmiCategory,
+  modifier: Modifier = Modifier,
+) {
+  val context = LocalContext.current
+  val categoryColors = LocalBmiCategoryColors.current
+  val trackBgColor = MaterialTheme.colorScheme.surfaceContainer
+  val markerRingColor = MaterialTheme.colorScheme.surface
+  val scaleSpan = BmiChartData.SCALE_MAX - BmiChartData.SCALE_MIN
+  val clampedBmi = bmi.toFloat().coerceIn(BmiChartData.SCALE_MIN, BmiChartData.SCALE_MAX)
+
+  FlatSectionCard(modifier = modifier.testTag("result_bmi_chart_card")) {
+    Column(
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+      Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+          text = stringResource(R.string.bmi_chart_title),
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.SemiBold,
+          color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+          text = stringResource(R.string.bmi_chart_subtitle),
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+
+      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        BmiChartData.bands.forEach { band ->
+          val isActive = band.category == activeCategory
+          val bandColor = categoryColors.colorFor(band.category)
+          val categoryTitle = BmiFormatters.categoryLabel(context, band.category)
+          val rangeText = stringResource(band.rangeTextRes)
+
+          Surface(
+            shape = RoundedCornerShape(10.dp),
+            color =
+              if (isActive) bandColor.copy(alpha = 0.12f)
+              else Color.Transparent,
+            border =
+              if (isActive) BorderStroke(1.dp, bandColor.copy(alpha = 0.38f))
+              else null,
+            modifier =
+              Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
+                contentDescription = "$categoryTitle: $rangeText"
+              },
+          ) {
+            Column(
+              modifier =
+                Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+              verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Canvas(modifier = Modifier.size(8.dp)) {
+                  drawCircle(color = bandColor, radius = size.minDimension / 2f)
+                }
+                Text(
+                  text = categoryTitle,
+                  style = MaterialTheme.typography.bodyMedium,
+                  fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
+                  color =
+                    if (isActive) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.weight(1f),
+                )
+                if (isActive) {
+                  Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = bandColor.copy(alpha = 0.18f),
+                  ) {
+                    Text(
+                      text = stringResource(R.string.bmi_chart_you_marker),
+                      style = MaterialTheme.typography.labelSmall,
+                      fontWeight = FontWeight.SemiBold,
+                      color = bandColor,
+                      modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    )
+                  }
+                }
+                Text(
+                  text = rangeText,
+                  style = MaterialTheme.typography.bodySmall.copy(fontFeatureSettings = "tnum"),
+                  fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Medium,
+                  color =
+                    if (isActive) bandColor
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+              }
+
+              Canvas(modifier = Modifier.fillMaxWidth().height(10.dp)) {
+                val barHeight = 6.dp.toPx()
+                val barTop = (size.height - barHeight) / 2f
+                val corner = CornerRadius(3.dp.toPx(), 3.dp.toPx())
+
+                drawRoundRect(
+                  color = trackBgColor,
+                  topLeft = Offset(0f, barTop),
+                  size = Size(size.width, barHeight),
+                  cornerRadius = corner,
+                )
+
+                val startFrac = (band.minBmi - BmiChartData.SCALE_MIN) / scaleSpan
+                val endFrac = (band.maxBmi - BmiChartData.SCALE_MIN) / scaleSpan
+                val segLeft = startFrac * size.width
+                val segWidth = ((endFrac - startFrac) * size.width).coerceAtLeast(4.dp.toPx())
+
+                drawRoundRect(
+                  color = if (isActive) bandColor else bandColor.copy(alpha = 0.72f),
+                  topLeft = Offset(segLeft, barTop),
+                  size = Size(segWidth, barHeight),
+                  cornerRadius = corner,
+                )
+
+                if (isActive && size.width > 0f) {
+                  val rawX = ((clampedBmi - BmiChartData.SCALE_MIN) / scaleSpan) * size.width
+                  val minX = (segLeft + 4.dp.toPx()).coerceAtMost(size.width)
+                  val maxX = (segLeft + segWidth - 4.dp.toPx()).coerceAtLeast(minX)
+                  val dotX = rawX.coerceIn(minX, maxX)
+                  val centerY = size.height / 2f
+                  drawCircle(
+                    color = markerRingColor,
+                    radius = 5.dp.toPx(),
+                    center = Offset(dotX, centerY),
+                  )
+                  drawCircle(
+                    color = bandColor,
+                    radius = 3.2.dp.toPx(),
+                    center = Offset(dotX, centerY),
+                  )
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -2921,6 +3133,7 @@ fun HistoryScreen(
   modifier: Modifier = Modifier,
   calculationCount: Int = 0,
   isOnline: Boolean = false,
+  isTabVisible: Boolean = true,
 ) {
   var showClearDialog by remember { mutableStateOf(false) }
   var pendingDeleteRecordId by remember { mutableStateOf<Long?>(null) }
@@ -3044,6 +3257,7 @@ fun HistoryScreen(
     StartIoHistoryBanner(
       calculationCount = calculationCount,
       isOnline = isOnline,
+      isTabVisible = isTabVisible,
     )
   }
 }

@@ -1,4 +1,4 @@
-package com.example
+package com.gazi
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

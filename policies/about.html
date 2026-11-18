@@ -246,7 +246,7 @@
         </div>
         <div class="meta-item">
           <strong>Package ID</strong>
-          <code>com.aistudio.bmicalc.qvxrkm</code>
+          <code>com.gazi.bmi.calculator</code>
         </div>
         <div class="meta-item">
           <strong>Version</strong>
@@ -278,8 +278,12 @@
             <p>Switch easily between Metric (cm, kg) and Imperial (ft/in, lb) on the Calculator screen, or pick your default unit in Settings.</p>
           </div>
           <div class="feature-card">
-            <h3>Detailed BMI Result</h3>
-            <p>See your exact BMI score, category badge, visual BMI range indicator bar, healthy weight range for your height, and a weight suggestion.</p>
+            <h3>Detailed BMI Result &amp; Chart</h3>
+            <p>See your exact BMI score, category badge, visual BMI range indicator bar, a 6-band BMI Chart highlighting your position, healthy weight range, and a weight suggestion.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Share Result as Image</h3>
+            <p>Generate a clean PNG summary card with your BMI score and BMI Chart and share it with any app using the Android Sharesheet.</p>
           </div>
           <div class="feature-card">
             <h3>Optional Age &amp; Gender</h3>
@@ -311,8 +315,8 @@
               <li><em>Age (optional):</em> <code>2 – 120 years</code></li>
             </ul>
           </li>
-          <li><strong>Step 3 — View Your Result:</strong> Tap <strong>Calculate BMI</strong> to open the Result screen, where you can review your BMI score, category, healthy weight range, and weight suggestion.</li>
-          <li><strong>Step 4 — Save to History (Optional):</strong> Tap <strong>Save Result</strong> if you want to keep a copy in your on-device <em>History</em> tab.</li>
+          <li><strong>Step 3 — View Your Result &amp; BMI Chart:</strong> Tap <strong>Calculate BMI</strong> to open the Result screen, where you can review your BMI score, category, interactive BMI Chart, healthy weight range, and weight suggestion.</li>
+          <li><strong>Step 4 — Save or Share (Optional):</strong> Tap <strong>Save Result</strong> to store a copy in your on-device <em>History</em> tab, or tap <strong>Share Result</strong> to export and share a PNG result card (including the BMI Chart) through Android's Sharesheet.</li>
         </ul>
       </section>
 
@@ -384,11 +388,11 @@
       </section>
 
       <section id="privacy-storage">
-        <h2>5. Storage &amp; Privacy</h2>
+        <h2>5. Storage, Privacy &amp; Advertising</h2>
         <ul>
-          <li><strong>On-Device Storage:</strong> Saved BMI records are stored locally in an Android Room SQLite database (<code>bmi_calculator_db</code>), and your theme/unit settings are stored in Jetpack DataStore (<code>bmi_user_preferences</code>).</li>
+          <li><strong>On-Device Storage:</strong> Saved BMI records are stored locally in an Android Room SQLite database (<code>bmi_calculator_db</code>), and your theme, unit settings, and local calculation count are stored in Jetpack DataStore (<code>bmi_user_preferences</code>).</li>
           <li><strong>No Account &amp; No Server Uploads:</strong> You do not need to sign up or log in. Your height, weight, age, gender, and BMI history are never uploaded to external servers, and Android cloud backup is disabled (<code>android:allowBackup="false"</code>).</li>
-          <li><strong>Zero Invasive Permissions &amp; No Ads:</strong> The app runs completely offline with no ads or third-party tracking SDKs. It never requests access to your camera, location, contacts, microphone, or personal files.</li>
+          <li><strong>Minimal Permissions &amp; Ad Support:</strong> BMI Calculator works completely offline for all calculations, history, and image sharing (via private <code>FileProvider</code> cache with zero storage permissions), and never requests access to your camera, location, contacts, microphone, or personal files. To keep the app free, it displays Start.io interstitial ads (at and every 8 calculations) and History banner ads (after 8 calculations) only when online, using standard <code>INTERNET</code>, <code>ACCESS_NETWORK_STATE</code>, and <code>AD_ID</code> permissions—with zero empty banner space when offline.</li>
         </ul>
       </section>
 

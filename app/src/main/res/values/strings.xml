@@ -69,6 +69,15 @@
     <string name="action_saved">Saved</string>
     <string name="action_recalculate">Recalculate</string>
     <string name="action_delete_record">Delete Record</string>
+    <string name="action_share_result">Share Result</string>
+    <string name="share_bmi_chooser_title">Share BMI Result</string>
+    <string name="share_bmi_text_format">My BMI is %1$s (%2$s) — calculated with BMI Calculator.</string>
+    <string name="share_bmi_error">Unable to share BMI image right now.</string>
+    <string name="bmi_chart_title">BMI Chart</string>
+    <string name="bmi_chart_subtitle">Standard adult BMI categories &amp; your position</string>
+    <string name="bmi_chart_you_marker">You</string>
+    <string name="share_card_header_badge">BMI RESULT</string>
+    <string name="share_card_footer_note">General informational screening tool — not medical advice.</string>
     <string name="message_result_saved">BMI result saved to history</string>
     <string name="result_unavailable_message">No BMI calculation is currently loaded.</string>
 
@@ -103,12 +112,12 @@
     <string name="settings_about_app_title">About App</string>
     <string name="settings_terms_conditions_title">Terms &amp; Conditions</string>
     <!-- External links for Settings items (replace with your live URLs) -->
-    <string name="url_privacy_policy" translatable="false">https://www.google.com</string>
-    <string name="url_about_app" translatable="false">https://www.google.com</string>
-    <string name="url_terms_conditions" translatable="false">https://www.google.com</string>
-    <string name="settings_privacy_policy_body">All BMI calculations, measurements, saved history records, and app preferences (theme and default units) are stored locally on your device and are never uploaded by us.\n\nAdvertisements: This app displays Start.io banner and interstitial ads when an internet connection is available. You can clear all locally saved BMI history at any time from the History screen.</string>
-    <string name="settings_about_app_body">BMI Calculator helps you compute your Body Mass Index using Metric (cm, kg) or Imperial (ft/in, lb) measurements, view healthy weight ranges for your height, and keep a local history of saved calculations.\n\nVersion: %1$s\nStorage: On-device local database</string>
-    <string name="settings_terms_conditions_body">BMI Calculator is provided for general informational and educational purposes only.\n\nBody Mass Index is a screening tool and does not constitute medical advice, diagnosis, or treatment. Standard adult BMI categories apply to adults aged 20 and above and may not accurately reflect body composition for athletes, older adults, pregnant individuals, or children and teenagers.\n\nAlways consult a qualified healthcare professional before making health, diet, or exercise decisions.</string>
+    <string name="url_privacy_policy" translatable="false">https://mushahidsaifee-bot.github.io/Details/privicy.html</string>
+    <string name="url_about_app" translatable="false">https://mushahidsaifee-bot.github.io/Details/</string>
+    <string name="url_terms_conditions" translatable="false">https://mushahidsaifee-bot.github.io/Details/terms.html</string>
+    <string name="settings_privacy_policy_body">All BMI calculations, measurements, saved history records, and app preferences (theme, default units, and local calculation count) are stored locally on your device and are never uploaded by us.\n\nImage Sharing: When you tap Share Result, a PNG summary card (with your BMI Chart) is rendered temporarily in the app\'s private cache via FileProvider with zero storage permissions and shared only through apps you pick.\n\nAdvertisements: This app integrates the Start.io advertising SDK to display interstitial ads every 8 BMI calculations and banner ads in History after 8 calculations when an internet connection is available. Start.io may access your Advertising ID and network state for ad delivery, while your BMI entries remain strictly on your device. When offline, ads are skipped with no empty banner space.\n\nYou can clear all locally saved BMI history at any time from the History screen.</string>
+    <string name="settings_about_app_body">BMI Calculator helps you compute your Body Mass Index using Metric (cm, kg) or Imperial (ft/in, lb) measurements, inspect a visual 6-band BMI Chart, view healthy weight ranges for your height, share results as a PNG image, and keep a local history of saved calculations.\n\nVersion: %1$s\nStorage: On-device local database\nAds: Supported by Start.io ads after 8 calculations when online (works fully offline)</string>
+    <string name="settings_terms_conditions_body">BMI Calculator is provided free of charge for general informational and educational purposes only.\n\nBody Mass Index is a screening tool and does not constitute medical advice, diagnosis, or treatment. Standard adult BMI categories apply to adults aged 20 and above and may not accurately reflect body composition for athletes, older adults, pregnant individuals, or children and teenagers.\n\nSharing &amp; Advertisements: You may share locally generated BMI result images via the Android Sharesheet. When online, third-party advertisements are served via Start.io (interstitial ads every 8 calculations and History banner ads after 8 calculations). Offline BMI calculations, charts, sharing, and history work without interruption. Always consult a qualified healthcare professional before making health, diet, or exercise decisions.</string>
     <string name="settings_section_app">Application</string>
     <string name="settings_version_label">App Version</string>
 

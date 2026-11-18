@@ -230,7 +230,7 @@
         </div>
         <div class="meta-item">
           <strong>Package ID</strong>
-          <code>com.aistudio.bmicalc.qvxrkm</code>
+          <code>com.gazi.bmi.calculator</code>
         </div>
         <div class="meta-item">
           <strong>Version</strong>
@@ -238,7 +238,7 @@
         </div>
         <div class="meta-item">
           <strong>Last Updated</strong>
-          November 16, 2026
+          November 18, 2026
         </div>
       </div>
     </header>
@@ -271,7 +271,8 @@
             </ul>
           </li>
           <li><strong>Standard Adult BMI Categories (Ages 20+):</strong> Underweight (below 18.5), Normal (18.5 – 24.9), Overweight (25.0 – 29.9), Obesity Class 1 (30.0 – 34.9), Obesity Class 2 (35.0 – 39.9), and Obesity Class 3 (40.0 or above).</li>
-          <li><strong>Healthy Weight Reference:</strong> Displays an estimated healthy weight range for your height based on BMI values between 18.5 and 24.9, along with a general weight suggestion.</li>
+          <li><strong>Healthy Weight Reference &amp; BMI Chart:</strong> Displays an estimated healthy weight range for your height based on BMI values between 18.5 and 24.9, a general weight suggestion, and a visual 6-band BMI Chart marking your position.</li>
+          <li><strong>Share Result as Image:</strong> Allows you to share a locally generated PNG summary image (including your BMI score and BMI Chart) through other apps via the Android Sharesheet.</li>
           <li><strong>On-Device History:</strong> You can tap <em>Save Result</em> to store a calculation in your local History tab, tap any saved item to review it, delete individual records, or tap <em>Clear All</em> to erase all saved records.</li>
           <li><strong>Appearance &amp; Unit Preferences:</strong> Choose between System, Light, or Dark theme and set Metric or Imperial as your default measurement unit in Settings.</li>
         </ul>
@@ -317,21 +318,22 @@
           We care about your privacy. BMI Calculator does not require an account or login, and it does not upload your height, weight, age, gender, or BMI history to external servers.
         </p>
         <ul>
-          <li><strong>Stored Locally on Your Device:</strong> Saved BMI records (Room SQLite database) and app preferences such as theme and default units (Jetpack DataStore) are kept locally on your device.</li>
+          <li><strong>Stored Locally on Your Device:</strong> Saved BMI records (Room SQLite database) and app preferences such as theme, default units, and local calculation count (Jetpack DataStore) are kept locally on your device. When you choose to share a result, a temporary PNG image is rendered into your device's private app cache and handed to the Android system Sharesheet via <code>FileProvider</code>.</li>
           <li><strong>No Cloud Backup:</strong> Automatic Android cloud backup is disabled in the App (<code>android:allowBackup="false"</code>).</li>
           <li><strong>Your Responsibility for Device Data:</strong> Because your saved records stay only on your phone or tablet, uninstalling the App or clearing its storage in Android Settings will permanently delete your saved BMI history.</li>
-          <li><strong>Privacy Policy:</strong> To learn more about local storage and privacy, please read our <a href="privicy.html">Privacy Policy</a>.</li>
+          <li><strong>Privacy Policy:</strong> To learn more about local storage, advertising via Start.io, and privacy, please read our <a href="privicy.html">Privacy Policy</a>.</li>
         </ul>
       </section>
 
       <section id="advertising">
-        <h2>6. Third-Party Links</h2>
+        <h2>6. Advertising &amp; Third-Party Links</h2>
         <p>
-          BMI Calculator is free to download and use and does not display advertisements.
+          BMI Calculator is free to download and use and is supported by advertisements provided through the <strong>Start.io</strong> advertising network.
         </p>
         <ul>
-          <li><strong>Offline Use:</strong> All BMI calculations and local history features work completely offline.</li>
-          <li><strong>Third-Party Content:</strong> External web links (such as policy or information links in Settings) may lead to websites operated by third parties. We do not own, control, or endorse third-party websites, products, or services, and we are not responsible for their content or practices.</li>
+          <li><strong>When Ads Appear:</strong> When your device is connected to the internet, interstitial ads may appear on the Calculator screen at and every 8 valid BMI calculations, and banner ads may appear in the History section after 8 calculations.</li>
+          <li><strong>Offline Use:</strong> All BMI calculations and local history features work completely offline without interruption. When your network connection is off, ads are skipped and no empty banner space is reserved.</li>
+          <li><strong>Third-Party Content &amp; Ads:</strong> Advertisements displayed in the App and external web links (such as policy or information links in Settings) may lead to websites or services operated by third parties. We do not own, control, or endorse third-party advertisements, websites, products, or services, and we are not responsible for their content, accuracy, or practices.</li>
         </ul>
       </section>
 
@@ -394,7 +396,7 @@
     </main>
 
     <footer>
-      <p>&copy; 2026 BMI Calculator. All rights reserved. | <a href="privicy.html">Privacy Policy</a></p>
+      <p>&copy; 2026 BMI Calculator. All rights reserved. | <a href="./">About App</a> | <a href="privicy.html">Privacy Policy</a></p>
     </footer>
   </div>
 </body>

@@ -1,4 +1,4 @@
-package com.example
+package com.gazi
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -49,9 +49,11 @@ object AdDisplayRules {
 
 object StartIoAdManager {
   @Volatile private var sdkInitialized = false
-  @Volatile private var interstitialAd: StartAppAd? = null
-  @Volatile private var isLoadingInterstitial = false
 
+  val isInitialized: Boolean
+    get() = sdkInitialized
+
+  @Suppress("DEPRECATION")
   fun initialize(context: Context, appId: String) {
     if (sdkInitialized) return
     synchronized(this) {
@@ -75,12 +77,18 @@ object StartIoAdManager {
       }
     }
   }
+}
+
+class StartIoInterstitialController {
+  @Volatile private var interstitialAd: StartAppAd? = null
+  @Volatile private var isLoadingInterstitial = false
 
   fun preloadInterstitial(context: Context, isOnline: Boolean) {
-    if (!sdkInitialized || !isOnline || isLoadingInterstitial) return
+    if (!StartIoAdManager.isInitialized || !isOnline || isLoadingInterstitial) return
     runCatching {
-      val currentAd = interstitialAd ?: StartAppAd(context.applicationContext).also { interstitialAd = it }
-      if (currentAd.isReady) return
+      val currentAd =
+        interstitialAd ?: StartAppAd(context.applicationContext).also { interstitialAd = it }
+      if (currentAd.state == Ad.AdState.READY) return
       isLoadingInterstitial = true
       currentAd.loadAd(
         object : AdEventListener {
@@ -110,13 +118,14 @@ object StartIoAdManager {
       }
     }
 
-    if (!sdkInitialized || !isOnline) {
+    if (!StartIoAdManager.isInitialized || !isOnline) {
       proceedOnce()
       return
     }
 
     val currentAd = interstitialAd
-    val isReady = runCatching { currentAd?.isReady == true }.getOrDefault(false)
+    val isReady =
+      runCatching { currentAd?.state == Ad.AdState.READY }.getOrDefault(false)
     if (currentAd == null || !isReady) {
       preloadInterstitial(context, isOnline)
       proceedOnce()
@@ -147,6 +156,8 @@ object StartIoAdManager {
       }.getOrDefault(false)
 
     if (!shown) {
+      interstitialAd = null
+      preloadInterstitial(context, isOnline)
       proceedOnce()
     }
   }
@@ -235,8 +246,10 @@ fun StartIoHistoryBanner(
   calculationCount: Int,
   isOnline: Boolean,
   modifier: Modifier = Modifier,
+  isTabVisible: Boolean = true,
 ) {
-  val shouldShow = AdDisplayRules.shouldShowHistoryBanner(calculationCount) && isOnline
+  val shouldShow =
+    isTabVisible && AdDisplayRules.shouldShowHistoryBanner(calculationCount) && isOnline
   if (!shouldShow) {
     return
   }
@@ -276,6 +289,9 @@ fun StartIoHistoryBanner(
               )
               runCatching { loadAd() }
             }
+          },
+          onRelease = { banner ->
+            runCatching { banner.hideBanner() }
           },
         )
       },
